@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BCA Brain Battle</title>
+
+    <!-- CSS File -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav>
+        <div class="logo">
+            BCA <span>Brain Battle</span>
+        </div>
+
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#difficulty">Quiz</a></li>
+            <li><a href="#subjects">Subjects</a></li>
+            <li><a href="#features">Features</a></li>
+        </ul>
+    </nav>
+
+
+    <!-- ================= HOME ================= -->
+    <section class="hero" id="home">
+
+        <h1>
+            Welcome to <span>BCA Brain Battle</span>
+        </h1>
+
+        <p>
+            Test your BCA knowledge, improve your skills and challenge yourself!
+        </p>
+
+        <small>
+            Choose your difficulty level to begin.
+        </small>
+
+    </section>
+
+
+    <!-- ================= DIFFICULTY ================= -->
+    <section id="difficulty">
+
+        <div class="section-title">
+            <h2>Choose Difficulty Level</h2>
+
+            <p>
+                Select a level before choosing your subject.
+            </p>
+        </div>
+
+
+        <div class="difficulty-container">
+
+            <!-- BASIC -->
+            <div class="difficulty-card easy">
+
+                <div class="icon">🌱</div>
+
+                <h3>Basic</h3>
+
+                <p>
+                    Easy questions for beginners and basic concepts.
+                </p>
+
+                <button
+                    class="btn"
+                    onclick="selectLevel('Basic')">
+                    Start Basic
+                </button>
+
+            </div>
+
+
+            <!-- MEDIUM -->
+            <div class="difficulty-card medium">
+
+                <div class="icon">⚡</div>
+
+                <h3>Medium</h3>
+
+                <p>
+                    Moderate questions to test your understanding.
+                </p>
+
+                <button
+                    class="btn"
+                    onclick="selectLevel('Medium')">
+                    Start Medium
+                </button>
+
+            </div>
+
+
+            <!-- HARD -->
+            <div class="difficulty-card hard">
+
+                <div class="icon">🔥</div>
+
+                <h3>Hard</h3>
+
+                <p>
+                    Challenging questions for advanced BCA students.
+                </p>
+
+                <button
+                    class="btn"
+                    onclick="selectLevel('Hard')">
+                    Start Hard
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= SUBJECTS ================= -->
+    <section class="subjects" id="subjects">
+
+        <div class="section-title">
+
+            <h2>Choose Your Subject</h2>
+
+            <p>
+                First select difficulty level, then choose your subject.
+            </p>
+
+        </div>
+
+
+        <div class="subject-container">
+
+            <!-- JAVA -->
+            <div
+                class="subject-card"
+                onclick="selectSubject('Java')">
+
+                <div class="subject-icon">☕</div>
+
+                <h3>Java</h3>
+
+                <p>
+                    OOP, Classes, Data Types, Operators and more.
+                </p>
+
+            </div>
+
+
+            <!-- COMPUTER NETWORK -->
+            <div
+                class="subject-card"
+                onclick="selectSubject('Computer Network')">
+
+                <div class="subject-icon">🌐</div>
+
+                <h3>Computer Network</h3>
+
+                <p>
+                    OSI, TCP/IP, Switching, Routing and Networks.
+                </p>
+
+            </div>
+
+
+            <!-- DBMS -->
+            <div
+                class="subject-card"
+                onclick="selectSubject('DBMS')">
+
+                <div class="subject-icon">🗄️</div>
+
+                <h3>DBMS</h3>
+
+                <p>
+                    SQL, Keys, Normalization, Transactions and more.
+                </p>
+
+            </div>
+
+
+            <!-- DESIGN THINKING -->
+            <div
+                class="subject-card"
+                onclick="selectSubject('Design Thinking')">
+
+                <div class="subject-icon">💡</div>
+
+                <h3>Design Thinking</h3>
+
+                <p>
+                    Empathy, Ideation, Prototyping and Innovation.
+                </p>
+
+            </div>
+
+
+            <!-- PROBABILITY -->
+            <div
+                class="subject-card"
+                onclick="selectSubject('Probability')">
+
+                <div class="subject-icon">📊</div>
+
+                <h3>Probability</h3>
+
+                <p>
+                    Events, Probability Rules, Bayes Theorem and more.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FEATURES ================= -->
+    <section class="features" id="features">
+
+        <h2>Why BCA Brain Battle?</h2>
+
+        <div class="feature-container">
+
+            <div class="feature">
+
+                <div>🎯</div>
+
+                <h3>Topic Based Quiz</h3>
+
+                <p>
+                    Choose a particular BCA subject and topic.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div>⏱️</div>
+
+                <h3>Timer</h3>
+
+                <p>
+                    Complete your quiz within the given time.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div>🏆</div>
+
+                <h3>Score System</h3>
+
+                <p>
+                    Get your score after completing the quiz.
+                </p>
+
+            </div>
+
+
+            <div class="feature">
+
+                <div>📈</div>
+
+                <h3>Improve Knowledge</h3>
+
+                <p>
+                    Practice regularly and improve your BCA concepts.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+
+        <p>
+            © 2026 BCA Brain Battle | BCA Semester 3 Project
+        </p>
+
+    </footer>
+
+
+    <!-- JavaScript File -->
+    <script src="script.js"></script>
+
+</body>
+</html>
