@@ -1,49 +1,214 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA Brain Battle</title>
+    <title>MasterQuiz Pro - CS & Math Hub</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>🧠 BCA Brain Battle</h1>
-        <p>Challenge your knowledge!</p>
-    </header>
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
-    <main class="container">
-        <h2>Select Difficulty</h2>
-
-        <div class="levels">
-            <button onclick="startQuiz('Basic')">Basic</button>
-            <button onclick="startQuiz('Medium')">Medium</button>
-            <button onclick="startQuiz('Hard')">Hard</button>
-        </div>
-
-        <section id="quiz-section" hidden>
-            <h2 id="quiz-title"></h2>
-            <p id="timer">Time: 60 seconds</p>
-            <p id="question-number"></p>
-            <h3 id="question"></h3>
-            <div id="options"></div>
-
-            <p id="feedback"></p>
-
-            <div class="navigation">
-                <button id="back-btn" onclick="previousQuestion()">Back</button>
-                <button id="next-btn" onclick="nextQuestion()">Next</button>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="logo-box" onclick="returnToHome()">
+                <div class="logo-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                <h1>Master<span>Quiz</span></h1>
             </div>
-        </section>
+            <div class="header-actions">
+                <button class="nav-btn" id="soundToggle" onclick="toggleAudio()" title="Toggle Sound">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+                <button class="nav-btn" onclick="openLeaderboard()" title="Leaderboard">
+                    <i class="fa-solid fa-trophy"></i>
+                </button>
+            </div>
+        </header>
 
-        <section id="result-section" hidden>
-            <h2>Quiz Results 🎉</h2>
-            <p id="score"></p>
-            <p id="percentage"></p>
-            <button onclick="location.reload()">Play Again</button>
-        </section>
-    </main>
+        <!-- MAIN VIEW WRAPPER -->
+        <main class="main-content">
+            
+            <!-- VIEW 1: HOME / SUBJECT SELECTION -->
+            <section id="homeView" class="view active">
+                <div class="hero-banner">
+                    <span class="hero-badge"><i class="fa-solid fa-bolt"></i> Ultimate CS & Math Arena</span>
+                    <h2>Test Your Technical Expertise</h2>
+                    <p>Select a subject below to challenge your knowledge across Operating Systems, Java, Computer Networks, and Mathematics.</p>
+                </div>
+
+                <div class="subjects-grid">
+                    <!-- OS -->
+                    <div class="subject-card" onclick="startQuiz('os')">
+                        <div class="card-icon os-color"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="card-info">
+                            <h3>Operating Systems</h3>
+                            <p>Processes, threads, deadlocks, virtual memory & scheduling.</p>
+                            <span class="meta-tag"><i class="fa-regular fa-clock"></i> 5 Qs • Medium</span>
+                        </div>
+                        <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- JAVA -->
+                    <div class="subject-card" onclick="startQuiz('java')">
+                        <div class="card-icon java-color"><i class="fa-brands fa-java"></i></div>
+                        <div class="card-info">
+                            <h3>Java Programming</h3>
+                            <p>OOPs, collections, multithreading, JVM & exceptions.</p>
+                            <span class="meta-tag"><i class="fa-regular fa-clock"></i> 5 Qs • Hard</span>
+                        </div>
+                        <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- CN -->
+                    <div class="subject-card" onclick="startQuiz('cn')">
+                        <div class="card-icon cn-color"><i class="fa-solid fa-network-wired"></i></div>
+                        <div class="card-info">
+                            <h3>Computer Networks</h3>
+                            <p>OSI layers, TCP/IP, routing protocols, IP addressing & security.</p>
+                            <span class="meta-tag"><i class="fa-regular fa-clock"></i> 5 Qs • Medium</span>
+                        </div>
+                        <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+
+                    <!-- MATH -->
+                    <div class="subject-card" onclick="startQuiz('math')">
+                        <div class="card-icon math-color"><i class="fa-solid fa-square-root-variable"></i></div>
+                        <div class="card-info">
+                            <h3>Mathematics</h3>
+                            <p>Linear algebra, calculus, discrete math & probability.</p>
+                            <span class="meta-tag"><i class="fa-regular fa-clock"></i> 5 Qs • Hard</span>
+                        </div>
+                        <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+                    </div>
+                </div>
+
+                <!-- QUICK LEADERBOARD PREVIEW -->
+                <div class="home-leaderboard-preview">
+                    <div class="preview-header">
+                        <h3><i class="fa-solid fa-medal"></i> Top Performers</h3>
+                        <button class="text-link-btn" onclick="openLeaderboard()">View All <i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                    <div id="miniScoreboardList" class="mini-scores">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: QUIZ ACTIVE VIEW -->
+            <section id="quizView" class="view">
+                <div class="quiz-top-bar">
+                    <button class="exit-btn" onclick="confirmExit()"><i class="fa-solid fa-arrow-left"></i> Exit</button>
+                    <div class="quiz-progress-wrap">
+                        <div class="progress-text">Question <span id="currentQNum">1</span> of <span id="totalQNum">5</span></div>
+                        <div class="progress-bar-bg"><div id="progressBarFill" class="progress-bar-fill"></div></div>
+                    </div>
+                    <div class="timer-badge" id="timerBadge">
+                        <i class="fa-regular fa-clock"></i> <span id="timeLeft">25</span>s
+                    </div>
+                </div>
+
+                <div class="quiz-card-container">
+                    <div class="question-meta-row">
+                        <span id="subjectBadge" class="subject-badge os">Operating Systems</span>
+                        <div class="streak-pill" id="streakPill" style="display: none;">
+                            <i class="fa-solid fa-fire"></i> <span id="streakCount">0</span> Streak
+                        </div>
+                    </div>
+
+                    <h2 id="questionText" class="question-title">Loading question...</h2>
+
+                    <div id="optionsContainer" class="options-grid">
+                        <!-- Options generated dynamically -->
+                    </div>
+
+                    <div class="quiz-footer-actions">
+                        <button id="nextBtn" class="primary-btn" onclick="handleNextQuestion()" disabled>
+                            Next Question <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: RESULTS & SCOREBOARD -->
+            <section id="resultsView" class="view">
+                <div class="results-card">
+                    <div class="trophy-header-icon" id="resultTrophyIcon">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h2 id="resultTitle">Quiz Completed!</h2>
+                    <p id="resultSub" class="result-sub-text">Fantastic performance!</p>
+
+                    <div class="score-stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-label">Final Score</span>
+                            <span class="stat-value" id="finalScoreVal">4/5</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Accuracy</span>
+                            <span class="stat-value" id="finalAccuracyVal">80%</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Time Taken</span>
+                            <span class="stat-value" id="finalTimeVal">42s</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Max Streak</span>
+                            <span class="stat-value" id="finalStreakVal">3</span>
+                        </div>
+                    </div>
+
+                    <!-- NAME INPUT FOR SCOREBOARD -->
+                    <div class="save-score-box" id="saveScoreBox">
+                        <p>Save your score to the global scoreboard:</p>
+                        <div class="input-group">
+                            <input type="text" id="playerNameInput" placeholder="Enter your name..." maxlength="15">
+                            <button class="primary-btn" onclick="saveUserScore()">Save Score</button>
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="secondary-btn" onclick="restartCurrentQuiz()"><i class="fa-solid fa-rotate-right"></i> Try Again</button>
+                        <button class="primary-btn" onclick="returnToHome()"><i class="fa-solid fa-house"></i> Back to Home</button>
+                        <button class="accent-btn" onclick="openLeaderboard()"><i class="fa-solid fa-trophy"></i> View Scoreboard</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: LEADERBOARD / SCOREBOARD CARDS -->
+    <div id="leaderboardModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-trophy" style="color: #fbbf24;"></i> Scoreboard & Leaderboard</h3>
+                <button class="close-modal-btn" onclick="closeLeaderboard()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterLeaderboard('all')">All Subjects</button>
+                <button class="filter-tab" onclick="filterLeaderboard('os')">OS</button>
+                <button class="filter-tab" onclick="filterLeaderboard('java')">Java</button>
+                <button class="filter-tab" onclick="filterLeaderboard('cn')">Networks</button>
+                <button class="filter-tab" onclick="filterLeaderboard('math')">Math</button>
+            </div>
+
+            <div class="scoreboard-cards-container" id="scoreboardCardsContainer">
+                <!-- Cards injected here -->
+            </div>
+
+            <div class="modal-footer">
+                <button class="danger-outline-btn" onclick="clearScoreboard()"><i class="fa-solid fa-trash"></i> Reset Leaderboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CANVAS FOR CONFETTI -->
+    <canvas id="confettiCanvas"></canvas>
 
     <script src="script.js"></script>
 </body>
