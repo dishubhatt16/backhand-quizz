@@ -1,1329 +1,151 @@
+```html
 <!DOCTYPE html>
-<html lang="en" class="h-full scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MasterQuiz Pro - Modern Learning & Scoreboard Portal</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    animation: {
-                        'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
-                        'float': 'float 4s ease-in-out infinite',
-                        'shine': 'shine 2s linear infinite',
-                        'border-glow': 'borderGlow 3s infinite linear',
-                    },
-                    keyframes: {
-                        pulseGlow: {
-                            '0%, 100%': { opacity: 0.3, transform: 'scale(1)' },
-                            '50%': { opacity: 0.7, transform: 'scale(1.08)' },
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        },
-                        shine: {
-                            '0%': { backgroundPosition: '-200% 0' },
-                            '100%': { backgroundPosition: '200% 0' },
-                        },
-                        borderGlow: {
-                            '0%': { borderColor: 'rgba(99, 102, 241, 0.4)' },
-                            '50%': { borderColor: 'rgba(236, 72, 153, 0.6)' },
-                            '100%': { borderColor: 'rgba(99, 102, 241, 0.4)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.92) translateY(16px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-        .animate-pop-in {
-            animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .glass-card {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .glass-card-hover {
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .glass-card-hover:hover {
-            transform: translateY(-6px) scale(1.01);
-            background: rgba(30, 41, 59, 0.85);
-            border-color: rgba(129, 140, 248, 0.4);
-            box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.3);
-        }
-
-        .gold-border {
-            border-color: rgba(245, 158, 11, 0.6) !important;
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.25) !important;
-        }
-        .silver-border {
-            border-color: rgba(148, 163, 184, 0.6) !important;
-            box-shadow: 0 0 20px rgba(148, 163, 184, 0.15) !important;
-        }
-        .bronze-border {
-            border-color: rgba(217, 119, 6, 0.6) !important;
-            box-shadow: 0 0 20px rgba(217, 119, 6, 0.2) !important;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 9999px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 9999px;
-        }
-
-        canvas#confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 100;
-        }
-    </style>
+    <title>BCA Brain Battle - Quiz Website</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="h-full bg-slate-950 text-slate-100 font-sans antialiased flex flex-col justify-between selection:bg-indigo-500 selection:text-white relative overflow-x-hidden min-h-screen">
+<body>
 
-    <canvas id="confetti-canvas"></canvas>
-
-    <div class="fixed top-[-10%] left-[-10%] w-[550px] h-[550px] rounded-full bg-indigo-600/20 blur-[140px] pointer-events-none animate-pulse-glow"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-purple-600/20 blur-[140px] pointer-events-none animate-pulse-glow" style="animation-delay: 1.5s;"></div>
-    <div class="fixed top-[40%] left-[30%] w-[350px] h-[350px] rounded-full bg-cyan-600/10 blur-[120px] pointer-events-none animate-pulse-glow" style="animation-delay: 3s;"></div>
-
-    <header class="w-full bg-slate-900/70 backdrop-blur-2xl border-b border-slate-800/80 sticky top-0 z-50 transition-all">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-3 cursor-pointer group" onclick="app.showScreen('home')">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white font-black text-xl group-hover:scale-105 transition-transform">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </div>
-                <div>
-                    <span class="text-xl font-black tracking-tight bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">MasterQuiz<span class="text-indigo-500">.</span></span>
-                    <span class="block text-[10px] text-slate-400 font-bold tracking-widest uppercase">PRO &bull; LEADERBOARD PORTAL</span>
-                </div>
-            </div>
-
-            <!-- Header Menu / Controls -->
-            <div class="flex items-center gap-2 sm:gap-4">
-                <button onclick="app.showScreen('leaderboard')" class="px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/80 hover:border-amber-500/50 text-amber-400 font-bold text-xs flex items-center gap-2 transition-all cursor-pointer shadow-sm">
-                    <i class="fa-solid fa-trophy text-amber-400"></i>
-                    <span class="hidden sm:inline">Leaderboard Cards</span>
-                </button>
-
-                <button id="sound-btn" onclick="soundFx.toggleMute()" title="Toggle Sound Effects" class="w-9 h-9 rounded-xl bg-slate-800/80 border border-slate-700/80 hover:border-slate-500 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer">
-                    <i id="sound-icon" class="fa-solid fa-volume-high text-xs text-indigo-400"></i>
-                </button>
-
-                <!-- Active Quiz HUD Stats -->
-                <div id="nav-stats" class="hidden items-center space-x-3 bg-slate-950/90 px-4 py-1.5 rounded-full border border-slate-700/80 text-xs font-semibold shadow-inner">
-                    <span id="nav-subject-badge" class="text-indigo-400 flex items-center gap-1.5">
-                        <i class="fa-solid fa-book-open"></i> <span id="lbl-nav-subj">OS</span>
-                    </span>
-                    <span class="text-slate-700">|</span>
-                    <span class="text-amber-400 flex items-center gap-1.5 font-mono">
-                        <i class="fa-solid fa-stopwatch"></i> <span id="lbl-nav-timer">00:00</span>
-                    </span>
-                </div>
-            </div>
-        </div>
+    <!-- Navigation Bar -->
+    <header>
+        <nav class="navbar">
+            <h1 class="logo">BCA Brain Battle</h1>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#subjects">Subjects</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full z-10">
+    <!-- Home Section -->
+    <section id="home" class="hero">
+        <h1>Welcome to BCA Brain Battle</h1>
+        <p>Test your knowledge, improve your skills, and challenge your brain!</p>
+        <a href="#subjects" class="btn">Start Learning</a>
+    </section>
 
-        <!-- SCREEN 1: Home & Subject Selection -->
-        <div id="screen-home" class="w-full animate-pop-in space-y-10">
-            <!-- Hero Title -->
-            <div class="text-center space-y-4 max-w-2xl mx-auto">
-                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-extrabold bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 shadow-sm animate-float">
-                    <i class="fa-solid fa-bolt text-amber-400"></i> Speed & Precision Evaluation
-                </div>
-                <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-                    Dominate the <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Tech Scoreboard</span>
-                </h1>
-                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
-                    Test your expertise across OS, Java, Networks, and Mathematics. Earn streak combos, beat personal bests, and post your score to the global hall of fame!
-                </p>
+    <!-- Difficulty Section -->
+    <section class="difficulty">
+        <h2>Choose Your Difficulty Level</h2>
+
+        <div class="difficulty-container">
+            <button class="level-btn" onclick="selectLevel('Basic')">
+                Basic
+            </button>
+
+            <button class="level-btn" onclick="selectLevel('Medium')">
+                Medium
+            </button>
+
+            <button class="level-btn" onclick="selectLevel('Hard')">
+                Hard
+            </button>
+        </div>
+
+        <p id="selected-level">Please select a difficulty level.</p>
+    </section>
+
+    <!-- Subjects Section -->
+    <section id="subjects" class="subjects">
+        <h2>Select Your Subject</h2>
+
+        <div class="subject-container">
+
+            <div class="subject-card">
+                <h3>Java</h3>
+                <p>Practice Java programming questions.</p>
+                <button onclick="startQuiz('Java')">Start Quiz</button>
             </div>
 
-            <!-- Subject Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
-                
-                <!-- OS Card -->
-                <div onclick="app.startQuiz('os')" class="glass-card glass-card-hover rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-indigo-500/10">
-                                <i class="fa-solid fa-microchip"></i>
-                            </div>
-                            <span class="text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">OS Core</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-indigo-300 transition-colors">Operating Systems</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-6">Process scheduling, deadlocks, paging, virtual memory & kernel calls.</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-xs font-bold">
-                        <span class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-indigo-400"></i> 5 Questions</span>
-                        <span class="text-indigo-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">Start <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
-                    </div>
-                </div>
-
-                <!-- Java Card -->
-                <div onclick="app.startQuiz('java')" class="glass-card glass-card-hover rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-amber-500/10">
-                                <i class="fa-brands fa-java"></i>
-                            </div>
-                            <span class="text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">OOP & JVM</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-amber-300 transition-colors">Java Programming</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-6">OOP principles, collections, JVM memory, exceptions, and polymorphism.</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-xs font-bold">
-                        <span class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-amber-400"></i> 5 Questions</span>
-                        <span class="text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">Start <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
-                    </div>
-                </div>
-
-                <!-- Computer Networks Card -->
-                <div onclick="app.startQuiz('cn')" class="glass-card glass-card-hover rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-cyan-500/10">
-                                <i class="fa-solid fa-network-wired"></i>
-                            </div>
-                            <span class="text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">Protocols</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">Computer Networks</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-6">OSI layers, TCP/UDP, IP addressing, DNS, ARP, and HTTP/HTTPS.</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-xs font-bold">
-                        <span class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-cyan-400"></i> 5 Questions</span>
-                        <span class="text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">Start <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
-                    </div>
-                </div>
-
-                <!-- Mathematics Card -->
-                <div onclick="app.startQuiz('math')" class="glass-card glass-card-hover rounded-3xl p-6 cursor-pointer flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-xl group-hover:scale-110 group-hover:rotate-3 transition-transform shadow-lg shadow-emerald-500/10">
-                                <i class="fa-solid fa-square-root-variable"></i>
-                            </div>
-                            <span class="text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">Discrete & Alg</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">Mathematics</h3>
-                        <p class="text-xs text-slate-400 leading-relaxed mb-6">Matrices, graph theory, derivatives, probability, and sets.</p>
-                    </div>
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-800 text-xs font-bold">
-                        <span class="text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-list-check text-emerald-400"></i> 5 Questions</span>
-                        <span class="text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">Start <i class="fa-solid fa-chevron-right text-[10px]"></i></span>
-                    </div>
-                </div>
-
+            <div class="subject-card">
+                <h3>Operating System</h3>
+                <p>Test your operating system knowledge.</p>
+                <button onclick="startQuiz('Operating System')">
+                    Start Quiz
+                </button>
             </div>
 
-            <!-- Home Banner Quick Stats -->
-            <div class="glass-card p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 border-indigo-500/20">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-extrabold text-white">Live Leaderboard Active</h4>
-                        <p class="text-xs text-slate-400">Scores are saved dynamically. Compete across all 4 core technical subjects.</p>
-                    </div>
-                </div>
-                <button onclick="app.showScreen('leaderboard')" class="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs transition-all shadow-lg shadow-indigo-500/25 cursor-pointer w-full md:w-auto text-center">
-                    <i class="fa-solid fa-trophy mr-1.5"></i> View High Scores & Leaderboard
+            <div class="subject-card">
+                <h3>Computer Networks</h3>
+                <p>Learn networking concepts through quizzes.</p>
+                <button onclick="startQuiz('Computer Network')">
+                    Start Quiz
+                </button>
+            </div>
+
+            <div class="subject-card">
+                <h3>Mathematics</h3>
+                <p>Improve your mathematical problem-solving skills.</p>
+                <button onclick="startQuiz('Mathematics')">
+                    Start Quiz
                 </button>
             </div>
 
         </div>
+    </section>
 
-        <!-- SCREEN 2: Active Quiz Card -->
-        <div id="screen-quiz" class="w-full hidden animate-pop-in space-y-6 max-w-2xl mx-auto">
-            
-            <!-- Quiz HUD Header -->
-            <div class="glass-card p-5 rounded-3xl shadow-2xl space-y-4 border-indigo-500/20">
-                <div class="flex items-center justify-between text-xs font-bold">
-                    <span id="quiz-progress-text" class="text-indigo-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa-solid fa-compass"></i> Question 1 of 5
-                    </span>
-                    <div class="flex items-center gap-3">
-                        <span id="streak-badge" class="hidden px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 font-extrabold text-[11px] animate-pulse">
-                            <i class="fa-solid fa-fire"></i> <span id="streak-count">0</span>x Combo!
-                        </span>
-                        <span id="quiz-timer-badge" class="flex items-center gap-2 px-3 py-1 bg-slate-900/90 rounded-full text-slate-200 border border-slate-700/80 font-mono">
-                            <i class="fa-solid fa-clock text-indigo-400"></i> <span id="timer-count">20s</span>
-                        </span>
-                    </div>
-                </div>
-                <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-800">
-                    <div id="progress-bar-fill" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full w-1/5 rounded-full transition-all duration-500 ease-out"></div>
-                </div>
-            </div>
+    <!-- Quiz Section -->
+    <section id="quiz-section" class="quiz-section" hidden>
+        <h2 id="quiz-title">Quiz</h2>
 
-            <!-- Question Card -->
-            <div class="glass-card p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
-                <div class="space-y-3">
-                    <span id="difficulty-badge" class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                        Medium Difficulty
-                    </span>
-                    <h2 id="question-title" class="text-lg sm:text-2xl font-extrabold text-white leading-snug">
-                        <!-- Dynamic Question Text -->
-                    </h2>
-                </div>
-
-                <!-- Options -->
-                <div id="options-container" class="space-y-3 pt-2">
-                    <!-- Dynamic Options -->
-                </div>
-
-                <!-- Footer Buttons -->
-                <div class="flex items-center justify-between pt-6 border-t border-slate-800">
-                    <button onclick="app.quitQuiz()" class="text-xs font-bold text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-800/50 cursor-pointer">
-                        <i class="fa-solid fa-xmark"></i> Quit Test
-                    </button>
-                    <button id="btn-next" onclick="app.nextQuestion()" disabled class="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs transition-all shadow-lg shadow-indigo-600/30 disabled:shadow-none cursor-pointer disabled:cursor-not-allowed flex items-center gap-2">
-                        Next Question <i class="fa-solid fa-arrow-right text-[11px]"></i>
-                    </button>
-                </div>
-            </div>
-
+        <div class="quiz-info">
+            <p>Question: <span id="question-number">1</span></p>
+            <p>Time Left: <span id="timer">30</span> seconds</p>
+            <p>Score: <span id="score">0</span></p>
         </div>
 
-        <!-- SCREEN 3: Results & Scoreboard Entry Modal -->
-        <div id="screen-results" class="w-full hidden animate-pop-in space-y-6 max-w-2xl mx-auto">
-            
-            <div class="glass-card p-6 sm:p-10 rounded-3xl shadow-2xl text-center space-y-8 relative overflow-hidden">
-                
-                <div class="relative w-20 h-20 mx-auto">
-                    <div class="absolute inset-0 bg-amber-500/20 rounded-3xl blur-xl animate-pulse"></div>
-                    <div class="relative w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-300 flex items-center justify-center text-slate-950 text-3xl shadow-xl font-bold">
-                        <i id="res-trophy-icon" class="fa-solid fa-trophy"></i>
-                    </div>
-                </div>
-
-                <div class="space-y-2">
-                    <h2 id="res-headline" class="text-3xl sm:text-4xl font-black text-white">Outstanding Job!</h2>
-                    <p id="results-subtitle" class="text-xs sm:text-sm text-slate-400 max-w-md mx-auto">
-                        Assessment Completed successfully.
-                    </p>
-                </div>
-
-                <!-- Score Stats Panel -->
-                <div class="grid grid-cols-3 gap-3 bg-slate-950/80 p-5 rounded-2xl border border-slate-800 shadow-inner">
-                    <div class="text-center">
-                        <span class="block text-[11px] font-semibold text-slate-400 mb-1 uppercase tracking-wider">Final Score</span>
-                        <span id="res-score" class="text-xl sm:text-2xl font-black text-indigo-400">4 / 5</span>
-                    </div>
-                    <div class="text-center border-x border-slate-800 px-2">
-                        <span class="block text-[11px] font-semibold text-slate-400 mb-1 uppercase tracking-wider">Accuracy</span>
-                        <span id="res-accuracy" class="text-xl sm:text-2xl font-black text-emerald-400">80%</span>
-                    </div>
-                    <div class="text-center">
-                        <span class="block text-[11px] font-semibold text-slate-400 mb-1 uppercase tracking-wider">Total Time</span>
-                        <span id="res-time" class="text-xl sm:text-2xl font-black text-amber-400 font-mono">01:12</span>
-                    </div>
-                </div>
-
-                <!-- Save Score Form Card -->
-                <div id="save-score-card" class="bg-indigo-950/30 border border-indigo-500/30 p-5 rounded-2xl text-left space-y-4">
-                    <div class="flex items-center justify-between">
-                        <h4 class="text-xs font-black uppercase text-indigo-300 tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-bookmark text-amber-400"></i> Save Score to Global Leaderboard
-                        </h4>
-                        <span class="text-[10px] text-slate-400">Local Persistence Enabled</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <!-- Avatar Selection -->
-                        <div class="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
-                            <i id="avatar-preview" class="fa-solid fa-user-astronaut text-indigo-400 text-lg"></i>
-                            <select id="avatar-select" onchange="app.updateAvatarPreview()" class="bg-transparent text-xs text-slate-200 font-bold focus:outline-none cursor-pointer">
-                                <option value="fa-user-astronaut">Astronaut</option>
-                                <option value="fa-robot">Cyber Robot</option>
-                                <option value="fa-user-ninja">Code Ninja</option>
-                                <option value="fa-laptop-code">Dev Wizard</option>
-                                <option value="fa-brain">Mind Master</option>
-                            </select>
-                        </div>
-                        <!-- Name Input -->
-                        <input id="player-name-input" type="text" placeholder="Enter Player Handle (e.g. Alex_Dev)" class="flex-1 bg-slate-900 border border-slate-700 focus:border-indigo-500 px-4 py-2.5 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none font-medium">
-                        <button id="btn-save-score" onclick="app.saveCurrentScore()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Save Entry
-                        </button>
-                    </div>
-                    <p id="save-feedback" class="text-[11px] text-emerald-400 hidden font-bold"><i class="fa-solid fa-circle-check"></i> Score saved successfully to Leaderboard!</p>
-                </div>
-
-                <!-- Review Breakdown -->
-                <div class="space-y-3 text-left">
-                    <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest px-1">Question Review Breakdown</h4>
-                    <div id="results-breakdown" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                        <!-- Dynamic items -->
-                    </div>
-                </div>
-
-                <!-- Action Footer -->
-                <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-800">
-                    <button onclick="app.restartCurrentQuiz()" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold text-xs transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-rotate-right"></i> Retake Test
-                    </button>
-                    <button onclick="app.showScreen('leaderboard')" class="flex-1 py-3.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-trophy"></i> View Leaderboard Cards
-                    </button>
-                </div>
-
-            </div>
-
+        <div class="progress-container">
+            <div id="progress-bar"></div>
         </div>
 
-        <!-- SCREEN 4: Dedicated Scoreboard & Leaderboard Cards System -->
-        <div id="screen-leaderboard" class="w-full hidden animate-pop-in space-y-8">
-            
-            <!-- Leaderboard Header -->
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
-                <div>
-                    <span class="text-xs font-bold text-amber-400 tracking-widest uppercase flex items-center gap-2">
-                        <i class="fa-solid fa-medal"></i> Global Hall of Fame
-                    </span>
-                    <h1 class="text-3xl font-black text-white mt-1">Scoreboard & Leaderboard Cards</h1>
-                    <p class="text-xs text-slate-400 mt-1">Review personal subject high scores and filter all-time player rankings.</p>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <button onclick="app.clearLeaderboardData()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-bold text-xs transition-all cursor-pointer flex items-center gap-2">
-                        <i class="fa-solid fa-trash-can"></i> Reset High Scores
-                    </button>
-                    <button onclick="app.showScreen('home')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs transition-all cursor-pointer flex items-center gap-2">
-                        <i class="fa-solid fa-house"></i> Back to Hub
-                    </button>
-                </div>
-            </div>
+        <h3 id="question">Question will appear here</h3>
 
-            <!-- SECTION A: SUBJECT HIGH SCORE CARDS -->
-            <div class="space-y-4">
-                <h3 class="text-sm font-black text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                    <i class="fa-solid fa-star text-amber-400"></i> Subject Personal High Score Cards
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="subject-high-score-cards">
-                    <!-- Dynamic Subject Score Cards rendered via JS -->
-                </div>
-            </div>
+        <div id="options-container" class="options-container"></div>
 
-            <!-- SECTION B: LEADERBOARD FILTERS & CARDS LIST -->
-            <div class="glass-card p-6 rounded-3xl space-y-6 shadow-2xl border-slate-800">
-                
-                <!-- Filter Controls Bar -->
-                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-5">
-                    
-                    <!-- Subject Filters -->
-                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                        <span class="text-xs font-bold text-slate-400 mr-2"><i class="fa-solid fa-filter text-indigo-400"></i> Subject:</span>
-                        <button onclick="app.filterLeaderboard('all')" class="filter-subj-btn px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs transition-all cursor-pointer" data-subj="all">All Subjects</button>
-                        <button onclick="app.filterLeaderboard('os')" class="filter-subj-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer" data-subj="os">OS</button>
-                        <button onclick="app.filterLeaderboard('java')" class="filter-subj-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer" data-subj="java">Java</button>
-                        <button onclick="app.filterLeaderboard('cn')" class="filter-subj-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer" data-subj="cn">CN</button>
-                        <button onclick="app.filterLeaderboard('math')" class="filter-subj-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer" data-subj="math">Math</button>
-                    </div>
+        <p id="feedback"></p>
 
-                    <!-- Search / Quick Info -->
-                    <div class="text-xs text-slate-400 font-semibold flex items-center gap-2">
-                        <i class="fa-solid fa-users text-amber-400"></i> Total Entries: <span id="lb-total-count" class="text-white font-bold">0</span>
-                    </div>
+        <button id="next-btn" onclick="nextQuestion()" hidden>
+            Next Question
+        </button>
 
-                </div>
+        <button onclick="exitQuiz()">Exit Quiz</button>
+    </section>
 
-                <!-- Leaderboard Cards Container -->
-                <div id="leaderboard-cards-container" class="space-y-3">
-                    <!-- Dynamic Leaderboard Cards Rendered Here -->
-                </div>
+    <!-- Result Section -->
+    <section id="result-section" class="result-section" hidden>
+        <h2>Quiz Completed!</h2>
+        <p>Your Score: <span id="final-score">0</span></p>
+        <p>Accuracy: <span id="accuracy">0%</span></p>
 
-            </div>
+        <button onclick="reviewAnswers()">Review Answers</button>
+        <button onclick="restartQuiz()">Retake Quiz</button>
+        <button onclick="goHome()">Back to Home</button>
 
-        </div>
+        <div id="review-container"></div>
+    </section>
 
-    </main>
+    <!-- About Section -->
+    <section id="about" class="about">
+        <h2>About BCA Brain Battle</h2>
+        <p>
+            BCA Brain Battle is an educational quiz website designed for
+            BCA students. It helps students prepare for examinations by
+            practising multiple-choice questions in Java, Operating
+            Systems, Computer Networks, and Mathematics.
+        </p>
+    </section>
 
-    <footer class="w-full py-5 text-center text-xs text-slate-500 border-t border-slate-900 bg-slate-950/80 z-10">
-        <p>MasterQuiz Pro Portal &bull; Full Offline LocalStorage Scoreboard Engine</p>
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 BCA Brain Battle. All Rights Reserved.</p>
     </footer>
 
-    <script>
-        // Web Audio Synthesizer (Zero External Audio File Dependency)
-        class SoundEngine {
-            constructor() {
-                this.ctx = null;
-                this.muted = false;
-            }
+    <script src="script.js"></script>
 
-            init() {
-                if (!this.ctx) {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (AudioCtx) this.ctx = new AudioCtx();
-                }
-            }
-
-            playCorrect() {
-                if (this.muted) return;
-                this.init();
-                if (!this.ctx) return;
-
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
-                osc.frequency.exponentialRampToValueAtTime(659.25, this.ctx.currentTime + 0.12); // E5
-                osc.frequency.exponentialRampToValueAtTime(783.99, this.ctx.currentTime + 0.25); // G5
-
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.35);
-            }
-
-            playWrong() {
-                if (this.muted) return;
-                this.init();
-                if (!this.ctx) return;
-
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.25);
-
-                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.3);
-            }
-
-            playFinish() {
-                if (this.muted) return;
-                this.init();
-                if (!this.ctx) return;
-
-                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-                notes.forEach((freq, idx) => {
-                    const osc = this.ctx.createOscillator();
-                    const gain = this.ctx.createGain();
-                    osc.type = 'triangle';
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0.12, this.ctx.currentTime + (idx * 0.1));
-                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (idx * 0.1) + 0.4);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
-                    osc.start(this.ctx.currentTime + (idx * 0.1));
-                    osc.stop(this.ctx.currentTime + (idx * 0.1) + 0.4);
-                });
-            }
-
-            toggleMute() {
-                this.muted = !this.muted;
-                const icon = document.getElementById('sound-icon');
-                if (this.muted) {
-                    icon.className = "fa-solid fa-volume-xmark text-xs text-rose-400";
-                } else {
-                    icon.className = "fa-solid fa-volume-high text-xs text-indigo-400";
-                }
-            }
-        }
-
-        const soundFx = new SoundEngine();
-
-        // Confetti Canvas Particle Engine
-        class ConfettiSystem {
-            constructor() {
-                this.canvas = document.getElementById('confetti-canvas');
-                this.ctx = this.canvas.getContext('2d');
-                this.particles = [];
-                this.animating = false;
-                this.resize();
-                window.addEventListener('resize', () => this.resize());
-            }
-
-            resize() {
-                this.canvas.width = window.innerWidth;
-                this.canvas.height = window.innerHeight;
-            }
-
-            trigger() {
-                this.particles = [];
-                const colors = ['#6366f1', '#a855f7', '#ec4899', '#3b82f6', '#10b981', '#f59e0b'];
-                for (let i = 0; i < 100; i++) {
-                    this.particles.push({
-                        x: this.canvas.width / 2,
-                        y: this.canvas.height / 2 - 50,
-                        vx: (Math.random() - 0.5) * 18,
-                        vy: (Math.random() - 0.7) * 18,
-                        size: Math.random() * 8 + 4,
-                        color: colors[Math.floor(Math.random() * colors.length)],
-                        rotation: Math.random() * 360,
-                        rSpeed: (Math.random() - 0.5) * 8,
-                        gravity: 0.35,
-                        opacity: 1
-                    });
-                }
-                if (!this.animating) {
-                    this.animating = true;
-                    this.loop();
-                }
-            }
-
-            loop() {
-                if (!this.animating) return;
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                let alive = 0;
-                this.particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += p.gravity;
-                    p.rotation += p.rSpeed;
-                    p.opacity -= 0.012;
-
-                    if (p.opacity > 0) {
-                        alive++;
-                        this.ctx.save();
-                        this.ctx.translate(p.x, p.y);
-                        this.ctx.rotate((p.rotation * Math.PI) / 180);
-                        this.ctx.globalAlpha = Math.max(0, p.opacity);
-                        this.ctx.fillStyle = p.color;
-                        this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-                        this.ctx.restore();
-                    }
-                });
-
-                if (alive > 0) {
-                    requestAnimationFrame(() => this.loop());
-                } else {
-                    this.animating = false;
-                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                }
-            }
-        }
-
-        const confetti = new ConfettiSystem();
-    </script>
-
-    <script>
-        // Questions Database
-        const quizData = {
-            os: {
-                name: "Operating Systems",
-                badgeClass: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
-                icon: "fa-microchip",
-                questions: [
-                    {
-                        question: "Which CPU scheduling algorithm gives the lowest average waiting time for a given set of processes?",
-                        difficulty: "Medium",
-                        options: ["First-Come First-Served (FCFS)", "Shortest Job First (SJF)", "Round Robin (RR)", "Priority Scheduling"],
-                        answer: 1,
-                        explanation: "SJF is mathematically proven to minimize average process waiting times."
-                    },
-                    {
-                        question: "What state occurs when processes wait endlessly on resources held by each other?",
-                        difficulty: "Easy",
-                        options: ["Thrashing", "Deadlock", "Segmentation Fault", "Starvation"],
-                        answer: 1,
-                        explanation: "Deadlock occurs when circular waiting holds resources among multiple processes."
-                    },
-                    {
-                        question: "Which memory management scheme permits non-contiguous allocation of physical memory?",
-                        difficulty: "Medium",
-                        options: ["Fixed Partitioning", "Paging", "Static Relocation", "Contiguous Allocation"],
-                        answer: 1,
-                        explanation: "Paging divides logical memory into pages and physical memory into frames for flexible non-contiguous loading."
-                    },
-                    {
-                        question: "What does the Unix system call 'fork()' execute?",
-                        difficulty: "Medium",
-                        options: ["Kills child process", "Spawns a duplicate child process", "Allocates heap space", "Reboots kernel"],
-                        answer: 1,
-                        explanation: "fork() creates an identical duplicate child process running in parallel."
-                    },
-                    {
-                        question: "What is 'Thrashing' in Virtual Memory?",
-                        difficulty: "Hard",
-                        options: ["Formatting virtual disks", "Excessive page faulting overwhelming CPU execution time", "Clearing cache registers", "System rebooting"],
-                        answer: 1,
-                        explanation: "Thrashing happens when the OS spends more time swapping pages than doing useful CPU computation."
-                    }
-                ]
-            },
-            java: {
-                name: "Java Programming",
-                badgeClass: "bg-amber-500/20 text-amber-300 border-amber-500/30",
-                icon: "fa-java",
-                questions: [
-                    {
-                        question: "Which OOP principle allows a single method call to exhibit different behavior at runtime?",
-                        difficulty: "Easy",
-                        options: ["Encapsulation", "Polymorphism", "Abstraction", "Inheritance"],
-                        answer: 1,
-                        explanation: "Polymorphism allows objects of different classes to respond uniquely to the same method invocation."
-                    },
-                    {
-                        question: "What is the result of using an uninitialized local variable in a Java method?",
-                        difficulty: "Medium",
-                        options: ["Evaluates to null", "Evaluates to 0", "Causes a compilation error", "Allocates random heap space"],
-                        answer: 2,
-                        explanation: "Java local variables do not receive default values; using them unassigned fails compilation."
-                    },
-                    {
-                        question: "Which Java collection structure prevents duplicate elements?",
-                        difficulty: "Easy",
-                        options: ["List", "Set", "Queue", "ArrayList"],
-                        answer: 1,
-                        explanation: "Set implementations (e.g. HashSet) enforce unique element constraints."
-                    },
-                    {
-                        question: "What does applying the 'final' modifier to a Java method prevent?",
-                        difficulty: "Medium",
-                        options: ["Prevents method overloading", "Prevents subclasses from overriding it", "Makes method thread-unsafe", "Deletes method from bytecode"],
-                        answer: 1,
-                        explanation: "A final method signature cannot be overridden by derived child classes."
-                    },
-                    {
-                        question: "How is Garbage Collection managed in the JVM?",
-                        difficulty: "Hard",
-                        options: ["Explicit delete operators", "Automated background JVM thread daemon", "Operating system kernel call", "Compiler pre-pass"],
-                        answer: 1,
-                        explanation: "The JVM includes an automated Garbage Collector thread that reclaims unreachable memory."
-                    }
-                ]
-            },
-            cn: {
-                name: "Computer Networks",
-                badgeClass: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-                icon: "fa-network-wired",
-                questions: [
-                    {
-                        question: "Which OSI model layer handles end-to-end IP packet routing?",
-                        difficulty: "Easy",
-                        options: ["Data Link", "Network Layer", "Transport Layer", "Session Layer"],
-                        answer: 1,
-                        explanation: "Layer 3 (Network Layer) manages logical IP addressing and path routing."
-                    },
-                    {
-                        question: "What distinguishes TCP from UDP protocols?",
-                        difficulty: "Medium",
-                        options: ["TCP is connectionless", "TCP provides connection-oriented reliable delivery; UDP is faster & connectionless", "UDP guarantees packet order", "TCP operates only over WiFi"],
-                        answer: 1,
-                        explanation: "TCP uses handshakes to guarantee data delivery, whereas UDP trades guarantees for speed."
-                    },
-                    {
-                        question: "Which system maps human hostnames (e.g. google.com) to numeric IP addresses?",
-                        difficulty: "Easy",
-                        options: ["DHCP", "DNS", "ARP", "BGP"],
-                        answer: 1,
-                        explanation: "The Domain Name System (DNS) resolves domain strings into numerical network IP addresses."
-                    },
-                    {
-                        question: "What default port is reserved for secure HTTPS traffic?",
-                        difficulty: "Easy",
-                        options: ["80", "21", "443", "8080"],
-                        answer: 2,
-                        explanation: "Port 443 is the standard encrypted SSL/TLS HTTP port."
-                    },
-                    {
-                        question: "What mapping does the Address Resolution Protocol (ARP) perform?",
-                        difficulty: "Hard",
-                        options: ["IP address to MAC address", "MAC address to Domain Name", "Port number to IP address", "URL to Router Gateway"],
-                        answer: 0,
-                        explanation: "ARP resolves Layer 3 IP addresses to physical Layer 2 MAC addresses."
-                    }
-                ]
-            },
-            math: {
-                name: "Mathematics",
-                badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-                icon: "fa-square-root-variable",
-                questions: [
-                    {
-                        question: "What is the sum of interior angles of a 6-sided regular hexagon?",
-                        difficulty: "Easy",
-                        options: ["360°", "540°", "720°", "900°"],
-                        answer: 2,
-                        explanation: "Sum = (n - 2) * 180°. For n=6, (4 * 180°) = 720°."
-                    },
-                    {
-                        question: "If a square matrix determinant equals zero, what property holds?",
-                        difficulty: "Medium",
-                        options: ["It is an Identity Matrix", "It is singular and has no matrix inverse", "It is symmetric", "All eigenvalues are 1"],
-                        answer: 1,
-                        explanation: "A matrix with det(A) = 0 is non-invertible or singular."
-                    },
-                    {
-                        question: "What is the derivative of f(x) = x³ + 2x?",
-                        difficulty: "Medium",
-                        options: ["3x² + 2", "3x + 2", "x² + 2", "3x² + x"],
-                        answer: 0,
-                        explanation: "Using the power rule: d/dx(x³) = 3x² and d/dx(2x) = 2. Result: 3x² + 2."
-                    },
-                    {
-                        question: "What is a connected undirected graph with no cycles termed?",
-                        difficulty: "Easy",
-                        options: ["Complete Graph", "Tree", "Bipartite Graph", "Hypercube"],
-                        answer: 1,
-                        explanation: "A connected graph without loops/cycles is defined as a Tree."
-                    },
-                    {
-                        question: "What is the probability of flipping two heads in sequence on a fair coin?",
-                        difficulty: "Easy",
-                        options: ["1/2", "1/3", "1/4", "3/4"],
-                        answer: 2,
-                        explanation: "P(H1) = 1/2, P(H2) = 1/2. Combined P = 1/2 * 1/2 = 1/4."
-                    }
-                ]
-            }
-        };
-
-        class QuizApp {
-            constructor() {
-                this.currentSubjectKey = null;
-                this.questions = [];
-                this.currentIndex = 0;
-                this.score = 0;
-                this.streak = 0;
-                this.userAnswers = [];
-                this.questionTimer = null;
-                this.timeLeft = 20;
-                this.totalTimer = null;
-                this.totalSeconds = 0;
-                this.currentActiveFilter = 'all';
-
-                // Initial Mock High Score Entries for immediate vibrant display
-                this.defaultScores = [
-                    { id: 1, name: "Alex_Cyber", avatar: "fa-user-ninja", subject: "os", score: 5, total: 5, accuracy: 100, time: "00:48", date: "2026-10-12" },
-                    { id: 2, name: "CodeWizard", avatar: "fa-laptop-code", subject: "java", score: 5, total: 5, accuracy: 100, time: "00:52", date: "2026-10-11" },
-                    { id: 3, name: "ByteRider", avatar: "fa-robot", subject: "cn", score: 4, total: 5, accuracy: 80, time: "01:05", date: "2026-10-10" },
-                    { id: 4, name: "MathPro", avatar: "fa-brain", subject: "math", score: 4, total: 5, accuracy: 80, time: "01:10", date: "2026-10-09" },
-                    { id: 5, name: "DevAstro", avatar: "fa-user-astronaut", subject: "os", score: 3, total: 5, accuracy: 60, time: "01:22", date: "2026-10-08" }
-                ];
-
-                this.initLocalStorage();
-            }
-
-            initLocalStorage() {
-                if (!localStorage.getItem('masterquiz_leaderboard')) {
-                    localStorage.setItem('masterquiz_leaderboard', JSON.stringify(this.defaultScores));
-                }
-            }
-
-            getLeaderboardData() {
-                try {
-                    return JSON.parse(localStorage.getItem('masterquiz_leaderboard')) || [];
-                } catch (e) {
-                    return this.defaultScores;
-                }
-            }
-
-            saveLeaderboardEntry(entry) {
-                const data = this.getLeaderboardData();
-                data.unshift(entry);
-                localStorage.setItem('masterquiz_leaderboard', JSON.stringify(data));
-            }
-
-            clearLeaderboardData() {
-                if (confirm("Reset all high scores and leaderboard records?")) {
-                    localStorage.removeItem('masterquiz_leaderboard');
-                    this.initLocalStorage();
-                    this.renderLeaderboardScreen();
-                }
-            }
-
-            showScreen(screenId) {
-                this.resetTimers();
-                ['home', 'quiz', 'results', 'leaderboard'].forEach(s => {
-                    const el = document.getElementById(`screen-${s}`);
-                    if (s === screenId) {
-                        el.classList.remove('hidden');
-                    } else {
-                        el.classList.add('hidden');
-                    }
-                });
-
-                if (screenId !== 'quiz') {
-                    document.getElementById('nav-stats').classList.remove('flex');
-                    document.getElementById('nav-stats').classList.add('hidden');
-                }
-
-                if (screenId === 'leaderboard') {
-                    this.renderLeaderboardScreen();
-                }
-            }
-
-            startQuiz(subjectKey) {
-                this.currentSubjectKey = subjectKey;
-                const subject = quizData[subjectKey];
-                this.questions = [...subject.questions];
-                this.currentIndex = 0;
-                this.score = 0;
-                this.streak = 0;
-                this.userAnswers = [];
-                this.totalSeconds = 0;
-
-                // Reset Save Form
-                document.getElementById('save-score-card').classList.remove('hidden');
-                document.getElementById('save-feedback').classList.add('hidden');
-                document.getElementById('btn-save-score').disabled = false;
-
-                // Header HUD
-                document.getElementById('lbl-nav-subj').innerText = subject.name;
-                document.getElementById('nav-stats').classList.remove('hidden');
-                document.getElementById('nav-stats').classList.add('flex');
-
-                this.showScreen('quiz');
-                this.startTotalTimer();
-                this.loadQuestion();
-            }
-
-            restartCurrentQuiz() {
-                if (this.currentSubjectKey) {
-                    this.startQuiz(this.currentSubjectKey);
-                }
-            }
-
-            startTotalTimer() {
-                if (this.totalTimer) clearInterval(this.totalTimer);
-                this.totalTimer = setInterval(() => {
-                    this.totalSeconds++;
-                    const m = Math.floor(this.totalSeconds / 60).toString().padStart(2, '0');
-                    const s = (this.totalSeconds % 60).toString().padStart(2, '0');
-                    document.getElementById('lbl-nav-timer').innerText = `${m}:${s}`;
-                }, 1000);
-            }
-
-            startQuestionTimer() {
-                this.timeLeft = 20;
-                document.getElementById('timer-count').innerText = `${this.timeLeft}s`;
-                if (this.questionTimer) clearInterval(this.questionTimer);
-
-                this.questionTimer = setInterval(() => {
-                    this.timeLeft--;
-                    document.getElementById('timer-count').innerText = `${this.timeLeft}s`;
-                    if (this.timeLeft <= 0) {
-                        clearInterval(this.questionTimer);
-                        this.handleTimeOut();
-                    }
-                }, 1000);
-            }
-
-            loadQuestion() {
-                const q = this.questions[this.currentIndex];
-                const total = this.questions.length;
-
-                document.getElementById('quiz-progress-text').innerHTML = `<i class="fa-solid fa-compass"></i> Question ${this.currentIndex + 1} of ${total}`;
-                document.getElementById('progress-bar-fill').style.width = `${((this.currentIndex + 1) / total) * 100}%`;
-
-                document.getElementById('difficulty-badge').innerText = `${q.difficulty || 'Medium'} Difficulty`;
-                document.getElementById('question-title').innerText = q.question;
-
-                const container = document.getElementById('options-container');
-                container.innerHTML = '';
-
-                q.options.forEach((optText, i) => {
-                    const btn = document.createElement('button');
-                    btn.className = "w-full text-left p-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 hover:border-indigo-500 hover:bg-slate-800/90 text-slate-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-between group cursor-pointer shadow-sm";
-                    btn.innerHTML = `
-                        <span class="flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-400 font-bold group-hover:border-indigo-500 group-hover:text-indigo-300 transition-colors">${String.fromCharCode(65 + i)}</span>
-                            <span>${optText}</span>
-                        </span>
-                        <span class="opt-status text-slate-500 text-base"></span>
-                    `;
-                    btn.onclick = () => this.selectOption(i, btn);
-                    container.appendChild(btn);
-                });
-
-                const streakBadge = document.getElementById('streak-badge');
-                if (this.streak >= 2) {
-                    streakBadge.classList.remove('hidden');
-                    document.getElementById('streak-count').innerText = this.streak;
-                } else {
-                    streakBadge.classList.add('hidden');
-                }
-
-                document.getElementById('btn-next').disabled = true;
-                this.startQuestionTimer();
-            }
-
-            selectOption(selectedIndex) {
-                if (this.isAnswering) return;
-                this.isAnswering = true;
-                clearInterval(this.questionTimer);
-
-                const q = this.questions[this.currentIndex];
-                const isCorrect = selectedIndex === q.answer;
-                const container = document.getElementById('options-container');
-                const buttons = container.getElementsByTagName('button');
-
-                if (isCorrect) {
-                    this.score++;
-                    this.streak++;
-                    soundFx.playCorrect();
-                } else {
-                    this.streak = 0;
-                    soundFx.playWrong();
-                }
-
-                this.userAnswers.push({
-                    question: q.question,
-                    options: q.options,
-                    selected: selectedIndex,
-                    correct: q.answer,
-                    explanation: q.explanation,
-                    isCorrect: isCorrect
-                });
-
-                for (let i = 0; i < buttons.length; i++) {
-                    buttons[i].disabled = true;
-                    buttons[i].classList.remove('hover:border-indigo-500', 'hover:bg-slate-800/90', 'cursor-pointer');
-
-                    if (i === q.answer) {
-                        buttons[i].className = "w-full text-left p-4 rounded-2xl bg-emerald-500/15 border-2 border-emerald-500 text-emerald-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-between shadow-lg shadow-emerald-500/10";
-                        buttons[i].querySelector('.opt-status').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-                    } else if (i === selectedIndex && !isCorrect) {
-                        buttons[i].className = "w-full text-left p-4 rounded-2xl bg-rose-500/15 border-2 border-rose-500 text-rose-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-between shadow-lg shadow-rose-500/10";
-                        buttons[i].querySelector('.opt-status').innerHTML = '<i class="fa-solid fa-circle-xmark text-rose-400"></i>';
-                    } else {
-                        buttons[i].classList.add('opacity-40');
-                    }
-                }
-
-                this.isAnswering = false;
-                document.getElementById('btn-next').disabled = false;
-            }
-
-            handleTimeOut() {
-                const q = this.questions[this.currentIndex];
-                this.streak = 0;
-                soundFx.playWrong();
-
-                this.userAnswers.push({
-                    question: q.question,
-                    options: q.options,
-                    selected: -1,
-                    correct: q.answer,
-                    explanation: q.explanation,
-                    isCorrect: false
-                });
-
-                const container = document.getElementById('options-container');
-                const buttons = container.getElementsByTagName('button');
-                for (let i = 0; i < buttons.length; i++) {
-                    buttons[i].disabled = true;
-                    if (i === q.answer) {
-                        buttons[i].className = "w-full text-left p-4 rounded-2xl bg-emerald-500/15 border-2 border-emerald-500 text-emerald-200 text-xs sm:text-sm font-semibold transition-all flex items-center justify-between";
-                        buttons[i].querySelector('.opt-status').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-                    } else {
-                        buttons[i].classList.add('opacity-40');
-                    }
-                }
-                document.getElementById('btn-next').disabled = false;
-            }
-
-            nextQuestion() {
-                this.currentIndex++;
-                if (this.currentIndex < this.questions.length) {
-                    this.loadQuestion();
-                } else {
-                    this.finishQuiz();
-                }
-            }
-
-            quitQuiz() {
-                if (confirm('Quit active assessment? Progress will be lost.')) {
-                    this.showScreen('home');
-                }
-            }
-
-            finishQuiz() {
-                this.resetTimers();
-                this.showScreen('results');
-
-                const total = this.questions.length;
-                const percentage = Math.round((this.score / total) * 100);
-
-                if (percentage >= 70) {
-                    confetti.trigger();
-                    soundFx.playFinish();
-                }
-
-                const headline = document.getElementById('res-headline');
-                const trophyIcon = document.getElementById('res-trophy-icon');
-                if (percentage === 100) {
-                    headline.innerText = "Perfect Score!";
-                    trophyIcon.className = "fa-solid fa-crown text-slate-950";
-                } else if (percentage >= 60) {
-                    headline.innerText = "Great Job!";
-                    trophyIcon.className = "fa-solid fa-trophy text-slate-950";
-                } else {
-                    headline.innerText = "Keep Practicing!";
-                    trophyIcon.className = "fa-solid fa-graduation-cap text-slate-950";
-                }
-
-                document.getElementById('results-subtitle').innerText = `You finished the ${quizData[this.currentSubjectKey].name} evaluation.`;
-                document.getElementById('res-score').innerText = `${this.score} / ${total}`;
-                document.getElementById('res-accuracy').innerText = `${percentage}%`;
-
-                const m = Math.floor(this.totalSeconds / 60).toString().padStart(2, '0');
-                const s = (this.totalSeconds % 60).toString().padStart(2, '0');
-                document.getElementById('res-time').innerText = `${m}:${s}`;
-
-                // Question breakdown
-                const breakdown = document.getElementById('results-breakdown');
-                breakdown.innerHTML = '';
-
-                this.userAnswers.forEach((ans, idx) => {
-                    const card = document.createElement('div');
-                    card.className = "p-4 rounded-2xl bg-slate-950/70 border border-slate-800 space-y-2 text-xs";
-
-                    const badge = ans.isCorrect
-                        ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Correct</span>'
-                        : '<span class="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30">Incorrect</span>';
-
-                    card.innerHTML = `
-                        <div class="flex items-start justify-between gap-3">
-                            <span class="font-bold text-slate-200">Q${idx + 1}: ${ans.question}</span>
-                            ${badge}
-                        </div>
-                        <div class="text-slate-400 space-y-1 pt-2 border-t border-slate-800/80">
-                            <p><strong class="text-slate-300">Selected:</strong> ${ans.selected >= 0 ? ans.options[ans.selected] : '<span class="text-rose-400">Timed Out</span>'}</p>
-                            <p><strong class="text-slate-300">Correct:</strong> <span class="text-emerald-400 font-medium">${ans.options[ans.correct]}</span></p>
-                            <p class="text-slate-400/90 italic pt-1 flex items-start gap-1.5"><i class="fa-solid fa-circle-info text-indigo-400 mt-0.5"></i> <span>${ans.explanation}</span></p>
-                        </div>
-                    `;
-                    breakdown.appendChild(card);
-                });
-            }
-
-            updateAvatarPreview() {
-                const val = document.getElementById('avatar-select').value;
-                document.getElementById('avatar-preview').className = `fa-solid ${val} text-indigo-400 text-lg`;
-            }
-
-            saveCurrentScore() {
-                const nameInput = document.getElementById('player-name-input');
-                const name = nameInput.value.trim() || 'Anonymous_Hero';
-                const avatar = document.getElementById('avatar-select').value;
-                const m = Math.floor(this.totalSeconds / 60).toString().padStart(2, '0');
-                const s = (this.totalSeconds % 60).toString().padStart(2, '0');
-
-                const entry = {
-                    id: Date.now(),
-                    name: name,
-                    avatar: avatar,
-                    subject: this.currentSubjectKey,
-                    score: this.score,
-                    total: this.questions.length,
-                    accuracy: Math.round((this.score / this.questions.length) * 100),
-                    time: `${m}:${s}`,
-                    date: new Date().toISOString().split('T')[0]
-                };
-
-                this.saveLeaderboardEntry(entry);
-
-                document.getElementById('btn-save-score').disabled = true;
-                document.getElementById('save-feedback').classList.remove('hidden');
-                soundFx.playCorrect();
-            }
-
-            renderLeaderboardScreen() {
-                const data = this.getLeaderboardData();
-
-                // 1. Render Subject High Score Cards
-                const highScoresContainer = document.getElementById('subject-high-score-cards');
-                highScoresContainer.innerHTML = '';
-
-                Object.keys(quizData).forEach(subjKey => {
-                    const subj = quizData[subjKey];
-                    const subjEntries = data.filter(item => item.subject === subjKey);
-                    
-                    // Sort by score desc, accuracy desc, then time
-                    subjEntries.sort((a, b) => b.score - a.score || b.accuracy - a.accuracy);
-                    const top = subjEntries[0] || null;
-
-                    const card = document.createElement('div');
-                    card.className = "glass-card p-5 rounded-3xl border-slate-800 space-y-4 relative overflow-hidden flex flex-col justify-between";
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-indigo-400">
-                                    <i class="fa-solid ${subj.icon}"></i>
-                                </div>
-                                <span class="text-[10px] uppercase font-black px-2 py-0.5 rounded-full ${subj.badgeClass}">${subj.name}</span>
-                            </div>
-                            <h4 class="text-xs font-bold text-slate-400">Personal Best Record</h4>
-                            <p class="text-xl font-black text-white mt-1">${top ? `${top.score} / ${top.total}` : 'No Score'}</p>
-                        </div>
-                        
-                        <div class="pt-3 border-t border-slate-800/80 text-[11px] space-y-1 text-slate-400">
-                            <div class="flex justify-between">
-                                <span>Player:</span>
-                                <span class="text-slate-200 font-bold">${top ? top.name : 'N/A'}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Accuracy:</span>
-                                <span class="text-emerald-400 font-bold">${top ? `${top.accuracy}%` : '-'}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Time Spent:</span>
-                                <span class="text-amber-400 font-mono">${top ? top.time : '-'}</span>
-                            </div>
-                        </div>
-                    `;
-                    highScoresContainer.appendChild(card);
-                });
-
-                // 2. Filter & Render Global Leaderboard Cards
-                this.renderFilteredLeaderboard();
-            }
-
-            filterLeaderboard(subjectKey) {
-                this.currentActiveFilter = subjectKey;
-                document.querySelectorAll('.filter-subj-btn').forEach(btn => {
-                    if (btn.dataset.subj === subjectKey) {
-                        btn.className = "filter-subj-btn px-3 py-1.5 rounded-xl bg-indigo-600 text-white font-bold text-xs transition-all cursor-pointer";
-                    } else {
-                        btn.className = "filter-subj-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer";
-                    }
-                });
-                this.renderFilteredLeaderboard();
-            }
-
-            renderFilteredLeaderboard() {
-                let data = this.getLeaderboardData();
-
-                if (this.currentActiveFilter !== 'all') {
-                    data = data.filter(item => item.subject === this.currentActiveFilter);
-                }
-
-                // Sort Leaderboard: Higher score first, higher accuracy, faster time
-                data.sort((a, b) => b.score - a.score || b.accuracy - a.accuracy || a.time.localeCompare(b.time));
-
-                document.getElementById('lb-total-count').innerText = data.length;
-                const container = document.getElementById('leaderboard-cards-container');
-                container.innerHTML = '';
-
-                if (data.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-12 text-slate-500 space-y-2">
-                            <i class="fa-solid fa-trophy text-3xl text-slate-700"></i>
-                            <p class="text-xs font-bold">No High Scores Logged for this filter yet.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                data.forEach((item, index) => {
-                    const rank = index + 1;
-                    const subjInfo = quizData[item.subject] || { name: item.subject, badgeClass: "bg-slate-800 text-slate-300" };
-
-                    // Rank Badges
-                    let rankBadge = `<span class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-xs font-black text-slate-400">#${rank}</span>`;
-                    let borderClass = "border-slate-800/80";
-
-                    if (rank === 1) {
-                        rankBadge = `<span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">🥇</span>`;
-                        borderClass = "gold-border";
-                    } else if (rank === 2) {
-                        rankBadge = `<span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-slate-300 to-slate-100 flex items-center justify-center text-slate-950 font-black text-sm shadow-md">🥈</span>`;
-                        borderClass = "silver-border";
-                    } else if (rank === 3) {
-                        rankBadge = `<span class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-700 to-amber-500 flex items-center justify-center text-white font-black text-sm shadow-md">🥉</span>`;
-                        borderClass = "bronze-border";
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = `glass-card p-4 rounded-2xl border ${borderClass} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:bg-slate-800/60`;
-
-                    card.innerHTML = `
-                        <!-- Left Info -->
-                        <div class="flex items-center gap-3.5">
-                            ${rankBadge}
-                            <div class="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-700/80 flex items-center justify-center text-indigo-400 text-lg shadow-inner">
-                                <i class="fa-solid ${item.avatar || 'fa-user-ninja'}"></i>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h4 class="text-sm font-extrabold text-white">${item.name}</h4>
-                                    <span class="text-[9px] uppercase font-black px-2 py-0.5 rounded-full ${subjInfo.badgeClass}">${subjInfo.name}</span>
-                                </div>
-                                <span class="text-[10px] text-slate-500 font-mono">Logged on ${item.date}</span>
-                            </div>
-                        </div>
-
-                        <!-- Right Stats -->
-                        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-6 border-t sm:border-t-0 border-slate-800/80 pt-3 sm:pt-0">
-                            <div class="text-left sm:text-right">
-                                <span class="block text-[10px] font-semibold text-slate-400 uppercase">Score</span>
-                                <span class="text-sm font-black text-indigo-400">${item.score} / ${item.total}</span>
-                            </div>
-                            <div class="text-left sm:text-right">
-                                <span class="block text-[10px] font-semibold text-slate-400 uppercase">Accuracy</span>
-                                <span class="text-sm font-black text-emerald-400">${item.accuracy}%</span>
-                            </div>
-                            <div class="text-left sm:text-right">
-                                <span class="block text-[10px] font-semibold text-slate-400 uppercase">Time</span>
-                                <span class="text-sm font-black text-amber-400 font-mono">${item.time}</span>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-
-            resetTimers() {
-                if (this.questionTimer) clearInterval(this.questionTimer);
-                if (this.totalTimer) clearInterval(this.totalTimer);
-            }
-        }
-
-        // Initialize Global App
-        const app = new QuizApp();
-    </script>
 </body>
 </html>
+```
